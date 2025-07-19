@@ -1,0 +1,26 @@
+package com.finoba.finoba.dtos.transaccion;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TransPorUsuarioDTO {
+
+    private Long idUsuario;
+
+    private String nombreApellido;
+
+    private String dni;
+
+    private List<TransRespUserDTO> transacciones = new ArrayList<>();
+
+}
