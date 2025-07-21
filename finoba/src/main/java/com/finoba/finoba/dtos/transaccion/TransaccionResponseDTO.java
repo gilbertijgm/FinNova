@@ -1,5 +1,6 @@
 package com.finoba.finoba.dtos.transaccion;
 
+import com.finoba.finoba.dtos.usuario.NombreDniUsuarioDTO;
 import com.finoba.finoba.dtos.usuario.UsuarioDTO;
 import com.finoba.finoba.entities.Usuario;
 import com.finoba.finoba.entities.enums.Categoria;
@@ -40,6 +41,6 @@ public class TransaccionResponseDTO {
 
     private String referenciaExterna;
 
-    private UsuarioDTO usuarioResponsable;
+    private NombreDniUsuarioDTO usuarioResponsable;
 
 }

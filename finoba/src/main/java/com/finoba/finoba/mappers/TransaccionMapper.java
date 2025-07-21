@@ -25,12 +25,10 @@ public interface TransaccionMapper {
 
     @Mapping(source = "usuario", target = "usuarioResponsable")
     TransaccionResponseDTO toResponse(Transaccion transaccion);
-
-    @Mapping(target = "idUsuario", source = "usuario.idUsuario")
-    @Mapping(target = "nombreApellido", expression = "java(usuario.getNombreApellido())")
-    @Mapping(target = "dni", source = "usuario.dni")
-    @Mapping(target = "transacciones", source = "listaTransacciones")
-    TransPorUsuarioDTO toTransPorUsuarioDTO(Usuario usuario, List<Transaccion> listaTransacciones);
-
-
+//
+//    @Mapping(target = "idUsuario", source = "usuario.idUsuario")
+//    @Mapping(target = "nombreApellido", expression = "java(usuario.getNombreApellido())")
+//    @Mapping(target = "dni", source = "usuario.dni")
+//    @Mapping(target = "transacciones", source = "listaTransacciones")
+//    TransPorUsuarioDTO toTransPorUsuarioDTO(Usuario usuario, List<Transaccion> listaTransacciones);
 }

@@ -1,6 +1,7 @@
 package com.finoba.finoba.service.implementaciones;
 
 import com.finoba.finoba.dtos.transaccion.TransPorUsuarioDTO;
+import com.finoba.finoba.dtos.transaccion.TransRespUserDTO;
 import com.finoba.finoba.dtos.transaccion.TransaccionRequestDTO;
 import com.finoba.finoba.dtos.transaccion.TransaccionResponseDTO;
 import com.finoba.finoba.entities.Transaccion;
@@ -14,13 +15,19 @@ import com.finoba.finoba.persistence.ITransaccionDAO;
 import com.finoba.finoba.persistence.IUsuarioDAO;
 import com.finoba.finoba.service.ITransaccionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,20 +64,55 @@ public class TransaccionServiceImpl implements ITransaccionService {
     }
 
     @Override
-    public Optional<TransaccionResponseDTO> obtenerTransaccion(String referenciaExterna) {
-        return Optional.empty();
+    public TransaccionResponseDTO obtenerTransaccion(String referenciaExterna) {
+        Transaccion transaccion = transaccionDAO.obtenerTransaccion(referenciaExterna)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaccion no encotrada con la referencia: "+ referenciaExterna));
+
+        TransaccionResponseDTO dto = transaccionMapper.toResponse(transaccion);
+
+        return dto;
+    }
+
+//    @Override
+//    public TransPorUsuarioDTO obtenerTransPorUsuario(Long usuarioId) {
+//        Usuario usuario = usuarioDAO.usuario(usuarioId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con el id: " +usuarioId));
+//
+//        List<Transaccion> transaccionList = transaccionDAO.obtenerTransPorUsuario(usuarioId);
+//
+//        TransPorUsuarioDTO dto = transaccionMapper.toTransPorUsuarioDTO(usuario,transaccionList);
+//
+//        return dto;
+//    }
+
+    @Override
+    public Page<TransRespUserDTO> obtenerTransPorUsuario(Long usuarioId, Pageable pageable) {
+        Usuario usuario = usuarioDAO.usuario(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
+
+        Page<Transaccion> transaccionesPage = transaccionDAO.obtenerTransPorUsuario(usuario.getIdUsuario(), pageable);
+
+        List<TransRespUserDTO> dtoList = transaccionesPage.getContent()
+                .stream()
+                .map(transaccionMapper::toTransRespUserDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, transaccionesPage.getTotalElements());
     }
 
     @Override
-    public TransPorUsuarioDTO obtenerTransPorUsuario(Long usuarioId) {
-        Usuario usuario = usuarioDAO.usuario(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con el id: " +usuarioId));
+    public Page<TransaccionResponseDTO> obtenerTransPorUsuarioFiltro(LocalDate fechaDesde, LocalDate fechaHasta, String categoria, String tipo, String estado, Long idUsuario, Pageable pageable) {
+        Usuario usuario = usuarioDAO.usuario(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + idUsuario));
 
-        List<Transaccion> transaccionList = transaccionDAO.obtenerTransPorUsuario(usuarioId);
+        Page<Transaccion> transaccionesPage = transaccionDAO.obtenerTransPorUsuarioFiltros(fechaDesde,fechaHasta,categoria,tipo,estado,usuario.getIdUsuario(), pageable);
 
-        TransPorUsuarioDTO dto = transaccionMapper.toTransPorUsuarioDTO(usuario,transaccionList);
+        List<TransaccionResponseDTO> dtoList = transaccionesPage.getContent()
+                .stream()
+                .map(transaccionMapper::toResponse)
+                .collect(Collectors.toList());
 
-        return dto;
+        return new PageImpl<>(dtoList, pageable, transaccionesPage.getTotalElements());
     }
 
     //en este metodo valido que el monto no sea negativo en caso de Ingreso, y que verifique que no sea mayor que el saldo actual

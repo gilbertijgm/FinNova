@@ -1,27 +1,21 @@
 package com.finoba.finoba.mappers;
 
-import com.finoba.finoba.dtos.transaccion.TransPorUsuarioDTO;
 import com.finoba.finoba.dtos.transaccion.TransRespUserDTO;
 import com.finoba.finoba.dtos.transaccion.TransaccionRequestDTO;
 import com.finoba.finoba.dtos.transaccion.TransaccionResponseDTO;
+import com.finoba.finoba.dtos.usuario.NombreDniUsuarioDTO;
 import com.finoba.finoba.entities.Transaccion;
 import com.finoba.finoba.entities.Usuario;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.processing.Generated;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-18T22:47:38-0300",
+    date = "2025-07-21T18:45:26-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.10 (Oracle Corporation)"
 )
 @Component
 public class TransaccionMapperImpl implements TransaccionMapper {
-
-    @Autowired
-    private UsuarioMapper usuarioMapper;
 
     @Override
     public TransaccionRequestDTO toDto(Transaccion transaccion) {
@@ -83,7 +77,7 @@ public class TransaccionMapperImpl implements TransaccionMapper {
 
         TransaccionResponseDTO.TransaccionResponseDTOBuilder transaccionResponseDTO = TransaccionResponseDTO.builder();
 
-        transaccionResponseDTO.usuarioResponsable( usuarioMapper.toDto( transaccion.getUsuario() ) );
+        transaccionResponseDTO.usuarioResponsable( usuarioToNombreDniUsuarioDTO( transaccion.getUsuario() ) );
         transaccionResponseDTO.idTransaccion( transaccion.getIdTransaccion() );
         transaccionResponseDTO.monto( transaccion.getMonto() );
         transaccionResponseDTO.fecha( transaccion.getFecha() );
@@ -96,34 +90,17 @@ public class TransaccionMapperImpl implements TransaccionMapper {
         return transaccionResponseDTO.build();
     }
 
-    @Override
-    public TransPorUsuarioDTO toTransPorUsuarioDTO(Usuario usuario, List<Transaccion> listaTransacciones) {
-        if ( usuario == null && listaTransacciones == null ) {
+    protected NombreDniUsuarioDTO usuarioToNombreDniUsuarioDTO(Usuario usuario) {
+        if ( usuario == null ) {
             return null;
         }
 
-        TransPorUsuarioDTO.TransPorUsuarioDTOBuilder transPorUsuarioDTO = TransPorUsuarioDTO.builder();
+        NombreDniUsuarioDTO.NombreDniUsuarioDTOBuilder nombreDniUsuarioDTO = NombreDniUsuarioDTO.builder();
 
-        if ( usuario != null ) {
-            transPorUsuarioDTO.idUsuario( usuario.getIdUsuario() );
-            transPorUsuarioDTO.dni( usuario.getDni() );
-        }
-        transPorUsuarioDTO.transacciones( transaccionListToTransRespUserDTOList( listaTransacciones ) );
-        transPorUsuarioDTO.nombreApellido( usuario.getNombreApellido() );
+        nombreDniUsuarioDTO.idUsuario( usuario.getIdUsuario() );
+        nombreDniUsuarioDTO.nombreApellido( usuario.getNombreApellido() );
+        nombreDniUsuarioDTO.dni( usuario.getDni() );
 
-        return transPorUsuarioDTO.build();
-    }
-
-    protected List<TransRespUserDTO> transaccionListToTransRespUserDTOList(List<Transaccion> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<TransRespUserDTO> list1 = new ArrayList<TransRespUserDTO>( list.size() );
-        for ( Transaccion transaccion : list ) {
-            list1.add( toTransRespUserDTO( transaccion ) );
-        }
-
-        return list1;
+        return nombreDniUsuarioDTO.build();
     }
 }

@@ -4,8 +4,11 @@ import com.finoba.finoba.entities.Transaccion;
 import com.finoba.finoba.persistence.ITransaccionDAO;
 import com.finoba.finoba.repository.TransaccionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +33,15 @@ public class TransaccionDAOImpl implements ITransaccionDAO {
     }
 
     @Override
-    public List<Transaccion> obtenerTransPorUsuario(Long usuarioId) {
-        List<Transaccion> transaccionesPorUsuario = transaccionRepository.obtenerTransPorUsuario(usuarioId);
+    public Page<Transaccion> obtenerTransPorUsuario(Long usuarioId, Pageable pageable) {
+        Page<Transaccion> transaccionesPorUsuario = transaccionRepository.obtenerTransPorUsuario(usuarioId, pageable);
+
+        return transaccionesPorUsuario;
+    }
+
+    @Override
+    public Page<Transaccion> obtenerTransPorUsuarioFiltros(LocalDate fechaDesde, LocalDate fechaHasta, String categoria, String tipo, String estado, Long idUsuario, Pageable pageable) {
+        Page<Transaccion> transaccionesPorUsuario = transaccionRepository.buscarTransConFiltros(fechaDesde,fechaHasta,categoria,tipo,estado,idUsuario, pageable);
 
         return transaccionesPorUsuario;
     }

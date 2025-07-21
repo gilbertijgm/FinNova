@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Pagination {
 
-    private int paginaActual;
-    private int tamanioDePagina;
-    private int totalDePaginas;
+    private int currentPage;
+    private int pageSize;
+    private int totalPages;
     private long totalElements;
-    private boolean pagSiguiente;
-    private boolean pagAnterior;
+    private boolean hasNext;
+    private boolean hasPrevious;
 }
